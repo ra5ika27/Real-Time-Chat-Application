@@ -20,8 +20,13 @@ io.on('connection',(socket) => {
     createAt: 123123
   });
 
-  socket.on('createMessage', (newMessage) => {
-    console.log('create message', newMessage);
+  socket.on('createMessage', (message) => {
+    console.log('create message', message);
+    io.emit('newMessage', {
+      from: message.from,
+      text: message.text,
+      createdAt: new Date().getTime()
+    })
   });
   socket.on('disconnect', () => {
     console.log('Client Disconnected');
