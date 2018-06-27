@@ -4,7 +4,7 @@ const publicPath = path.join(__dirname, '../public');
 const express = require('express');
 const socketIO = require('socket.io');
 
-const {generateMessage} = require('./utils/message');
+const {generateMessage, generateLocationMessage} = require('./utils/message');
 const port = process.env.PORT || 3000;
 var app = express();
 var server = http.createServer(app);
@@ -28,10 +28,14 @@ io.on('connection',(socket) => {
     //   createdAt: 1234
     // })
   });
+
+  socket.on ('createLocationMessage', (coords) => {
+    io.emit('newLocationMessage', generateLocationMessage('User', coords.latitude, coords.longitude))
+  });
   socket.on('disconnect', () => {
     console.log('Client Disconnected');
   });
 });
 server.listen(port, () => {
-  console.log(`Server is up o port ${port}`);
+  console.log(`Server is up on port ${port}`);
 });
