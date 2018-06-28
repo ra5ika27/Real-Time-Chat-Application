@@ -23,14 +23,13 @@ io.on('connection',(socket) => {
 
   //socket.broadcast.emit('newMessage', generateMessage('Admin', "New User joined"));
   socket.on('createMessage', (message, callback) => {
-    console.log('create message', message);
-    io.emit('newMessage', generateMessage(message.from, message.text));
+    var user = users.getUser(socket.id);
+
+    if (user && isRealString(message.text)) {
+      io.to(user.room).emit('newMessage', generateMessage(user.name, message.text));
+    }
+
     callback();
-    // socket.broadcast.emit('newMessage', {
-    //   from: message.from,
-    //   text: message.text,
-    //   createdAt: 1234
-    // })
   });
 
   socket.on('join', (params, callback) => {
@@ -51,7 +50,12 @@ io.on('connection',(socket) => {
   });
 
   socket.on ('createLocationMessage', (coords) => {
-    io.emit('newLocationMessage', generateLocationMessage('User', coords.latitude, coords.longitude))
+    var user = users.getUser(socket.id);
+
+    if (user) {
+      io.to(user.room).emit('newLocationMessage', generateLocationMessage(user.name, coords.latitude, coords.longitude));
+    }
+
   });
   socket.on('disconnect', () => {
     var user = users.removeUser(socket.id);
